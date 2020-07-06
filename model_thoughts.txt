@@ -1,0 +1,33 @@
+User signup
+Password management
+Subreddit creation
+Users can subscribe to subreddit
+Users can post new links to things to subreddits
+Users can post text content to subreddits
+Users can post comments on both links and text submissions
+Basic subreddit moderator tools (removing posts, comments)
+Upvoting on both submissions and comments
+Downvoting on both submissions and comments
+Stretch goal: direct messages from user to user
+
+
+1. User
+    Custom user model
+    1. subscriptions relationship -Many to one
+2. Subreadit
+    1. name
+    2. moderator relationship -one to one
+3. Post
+    1. Subreadit relationship -one to one
+    2. User relationship -one to one
+    3. Content
+4. Comment
+    1. Post relationship -one to one
+    2. User relationship - one to one
+    3. Content
+5. PostVote
+    1. Post relationship -one to one
+    2. User relationship -one to one
+6. CommentVote
+    1. Comment relationship -one to one
+    2. User relationship -one to one
