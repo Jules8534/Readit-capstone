@@ -13,7 +13,9 @@ Stretch goal: direct messages from user to user
 
 1. User
     Custom user model
-    1. subscriptions relationship -Many to one
+1.5 Subscription
+    1. user relationship -many to one
+    2. subreadit relationship -many to one
 2. Subreadit
     1. name
     2. moderator relationship -one to one
@@ -23,7 +25,7 @@ Stretch goal: direct messages from user to user
     3. Content
 4. Comment
     1. Post relationship -one to one
-    2. User relationship - one to one
+    2. User relationship -one to one
     3. Content
 5. PostVote
     1. Post relationship -one to one

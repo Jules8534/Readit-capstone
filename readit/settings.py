@@ -25,7 +25,7 @@ SECRET_KEY = 'rm$rkr1hrbkj$5*4os$43#ogbk6_0*hqh$!v6_k1(9za*9nh8s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'readit_site'
 ]
 
 MIDDLEWARE = [
@@ -118,3 +119,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+AUTH_USER_MODEL = 'readit_site.ReaditUserModel'
