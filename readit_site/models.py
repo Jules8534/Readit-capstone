@@ -9,11 +9,7 @@ class ReaditUserModel(AbstractUser):
 
 class SubreaditModel(models.Model):
     name = models.CharField(max_length=45)
-    moderator = models.OneToOneField(
-        ReaditUserModel,
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
+    moderator = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -24,3 +20,22 @@ class SubscriptionModel(models.Model):
 
     def __str__(self):
         return f"{self.user.username} \ {self.subreadit.name}"
+
+class PostModel(models.Model):
+    subreadit = models.ForeignKey(SubreaditModel, on_delete=models.CASCADE),
+    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE),
+    title = models.CharField(max_length=150)
+    content = models.CharField(max_length=500)
+
+class CommentModel(models.Model):
+    post = models.ForeignKey(PostModel, on_delete=models.CASCADE),
+    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE),
+    content = models.CharField(max_length=500)
+
+class PostVoteModel(models.Model):
+    post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
+
+class CommentVoteModel(models.Model):
+    comment = models.ForeignKey(CommentModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
