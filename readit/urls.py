@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from readit_site.urls import urlpatterns as readiturls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+urlpatterns += readiturls
