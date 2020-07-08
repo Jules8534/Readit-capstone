@@ -26,11 +26,15 @@ class PostModel(models.Model):
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE),
     title = models.CharField(max_length=150)
     content = models.CharField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class CommentModel(models.Model):
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE),
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE),
     content = models.CharField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class PostVoteModel(models.Model):
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
