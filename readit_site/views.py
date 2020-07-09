@@ -45,3 +45,12 @@ def readitusermodel_view(request):
         form = ReaditUserModelForm()
         context['readitusermodel_form'] = form
     return render(request, 'register.html', context)
+
+def subreadit_view(request, subreadit):
+    pass
+
+def post_view(request, subreadit, postid):
+    pass
+
+def createsubreadit_view(request):
+    pass
