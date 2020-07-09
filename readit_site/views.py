@@ -36,9 +36,7 @@ def readitusermodel_view(request):
             form.save()
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
-            print(password)
             account = authenticate(username=username, password=password)
-            print(account)
             login(request, account)
             return redirect('homepage')
         else:  # GET request
