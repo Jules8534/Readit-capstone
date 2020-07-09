@@ -1,9 +1,9 @@
-from django.shortcuts import render, reverse, HttpResponseRedirect
+from django.shortcuts import render, reverse, redirect, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm
+from .forms import LoginForm, ReaditUserModelForm
 # Create your views here.
 
 
@@ -32,6 +32,7 @@ def login_view(request):
     return render(request, html, {"form": form})
 
 
+
 # https://simpleisbetterthancomplex.com/tips/2016/08/04/django-tip-9-password-change-form.html
 @login_required
 def change_password(request):
@@ -56,3 +57,30 @@ def change_password(request):
 def logoutview(request):
     logout(request)
     return HttpResponseRedirect(reverse('homepage'))
+
+def readitusermodel_view(request):
+    context = {}
+    if request.POST:
+        form = ReaditUserModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            account = authenticate(username=username, password=password)
+            login(request, account)
+            return redirect('homepage')
+        else:  # GET request
+            context['readitusermodel_form'] = form
+    else:
+        form = ReaditUserModelForm()
+        context['readitusermodel_form'] = form
+    return render(request, 'register.html', context)
+
+def subreadit_view(request, subreadit):
+    pass
+
+def post_view(request, subreadit, postid):
+    pass
+
+def createsubreadit_view(request):
+    pass

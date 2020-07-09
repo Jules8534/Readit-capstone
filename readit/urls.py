@@ -19,5 +19,6 @@ from readit_site.urls import urlpatterns as readiturls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('', index.html, name="homepage"),
 ]
 urlpatterns += readiturls
