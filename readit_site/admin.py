@@ -1,6 +1,17 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import ReaditUserModel
+# from django.contrib.auth.admin import UserAdmin
+from readit_site.models import *
 # Register your models here.
 
-admin.site.register(ReaditUserModel, UserAdmin)
+# https://stackoverflow.com/questions/9443863/register-every-table-class-from-an-app-in-the-django-admin-page
+models = (
+    ReaditUserModel,
+    SubreaditModel,
+    SubscriptionModel,
+    PostModel,
+    CommentModel,
+    PostVoteModel,
+    CommentVoteModel,
+)
+
+admin.site.register(models)
