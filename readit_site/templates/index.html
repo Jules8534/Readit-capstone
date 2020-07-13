@@ -1,3 +1,23 @@
-<h1>Welcome, {{name}}</h1>
-<a href={%url 'change_password'%}><button>Change Password</button></a>
-<a href={%url 'logout_url'%}><button>Logout</button></a>
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <a href={%url 'change_password'%}><button>Change Password</button></a>
+    <a href={%url 'logout_url'%}><button>Logout</button></a>
+</div>
+
+<div style="border: 2px solid #000;">
+    <h1>This is the body</h1>
+    <p>This is where you would place info for the body of the site.</p>
+
+    <ul>
+        {% for subreadit in subreadits %}
+        <li><a href="/r/{{ subreadit.name }}/">{{ subreadit.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    {% include 'snippets/snippet.html' %}
+
+</div>
+
+{% endblock content %}

@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import LoginForm, ReaditUserModelForm
+from .models import SubreaditModel
 # Create your views here.
 
 
@@ -11,7 +12,14 @@ from .forms import LoginForm, ReaditUserModelForm
 def index(request):
     html = "index.html"
     username = request.user.username
-    return render(request, html, {"name": username})
+    subreadits = SubreaditModel.objects.all()
+    return render(
+        request, html,
+        {
+            "name": username,
+            "subreadits": subreadits,
+        }
+    )
 
 
 def login_view(request):
