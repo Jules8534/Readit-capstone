@@ -1,12 +1,19 @@
 <h1>Welcome to the {{subreadit.name}} community</h1>
+
 {% if subreadit.description %}
-    <p>{{subreadit.description}}</p>
+<p>{{subreadit.description}}</p>
 {% endif %}
 <a href="{{subscribe_link}}">{{subscription|yesno:"Unsubscribe,Subscribe"}}</a>
+<h3>Add a post</h3>
+<!-- post form goes here -->
+<form action="" method="POST">
+  {% csrf_token %} {{form.as_p}}
+  <input type="submit" value="Add Post" />
+</form>
 {% for post in posts %}
-    <ul>
-        <li>{{ post.title }}</li>
-        <li>{{ post.content }}</li>
-        <li>{{ post.created_at }}</li>
-    </ul>
+<ul>
+  <li>{{ post.title }}</li>
+  <li>{{ post.content }}</li>
+  <li>{{ post.created_at }}</li>
+</ul>
 {% endfor %}
