@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm, ReaditUserModelForm
-from .models import SubreaditModel, PostModel
+from .forms import LoginForm, ReaditUserModelForm, AddPost
+from .models import SubreaditModel, PostModel, ReaditUserModel
 # Create your views here.
 
 
@@ -40,7 +40,6 @@ def login_view(request):
     return render(request, html, {"form": form})
 
 
-
 # https://simpleisbetterthancomplex.com/tips/2016/08/04/django-tip-9-password-change-form.html
 @login_required
 def change_password(request):
@@ -66,6 +65,7 @@ def logoutview(request):
     logout(request)
     return HttpResponseRedirect(reverse('homepage'))
 
+
 def readitusermodel_view(request):
     context = {}
     if request.POST:
@@ -84,6 +84,7 @@ def readitusermodel_view(request):
         context['readitusermodel_form'] = form
     return render(request, 'register.html', context)
 
+
 def subreadit_view(request, subreadit):
     try:
         subreadit = SubreaditModel.objects.get(name=subreadit)
@@ -91,10 +92,34 @@ def subreadit_view(request, subreadit):
         return HttpResponseRedirect(reverse('homepage'))
 
     posts = subreadit.postmodel_set.all()
-    return render(request, 'subreadit.html', {"subreadit":subreadit, "posts":posts})
+    return render(request, 'subreadit.html', {"subreadit": subreadit, "posts": posts})
 
-def post_view(request, subreadit, postid):
-    pass
+
+@login_required
+def post_view(request, subreadit, user_id):
+    if request.method == 'POST':
+        form = AddPost(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return HttpResponseRedirect('add_post', pk=post.pk)
+        else:
+            form = AddPost()
+
+    # if request.method == 'POST':
+    #     form = AddPost(request.POST)
+    # if form.is_valid():
+    #     data = form.cleaned_data
+    #     all_user = ReaditUserModel.objects.all()
+    #     user = ReaditUserModel.objects.get(id=user_id)
+    #     post = PostModel.objects.create(
+    #         post=data['post'],
+    #         author=user,
+    #     )
+        return render(request, 'subreadit.html', {'form': form})
+
 
 def createsubreadit_view(request):
     pass
