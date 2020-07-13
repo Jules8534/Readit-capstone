@@ -2,3 +2,10 @@
 {% if subreadit.description %}
     <p>{{subreadit.description}}</p>
 {% endif %}
+{% for post in posts %}
+    <ul>
+        <li>{{ post.title }}</li>
+        <li>{{ post.content }}</li>
+        <li>{{ post.created_at }}</li>
+    </ul>
+{% endfor %}

@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import LoginForm, ReaditUserModelForm
-from .models import SubreaditModel
+from .models import SubreaditModel, PostModel
 # Create your views here.
 
 
@@ -85,7 +85,13 @@ def readitusermodel_view(request):
     return render(request, 'register.html', context)
 
 def subreadit_view(request, subreadit):
-    pass
+    try:
+        subreadit = SubreaditModel.objects.get(name=subreadit)
+    except SubreaditModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+
+    posts = subreadit.postmodel_set.all()
+    return render(request, 'subreadit.html', {"subreadit":subreadit, "posts":posts})
 
 def post_view(request, subreadit, postid):
     pass
