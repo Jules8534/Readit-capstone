@@ -2,6 +2,7 @@
 {% if subreadit.description %}
     <p>{{subreadit.description}}</p>
 {% endif %}
+<a href="{{subscribe_link}}">{{subscription|yesno:"Unsubscribe,Subscribe"}}</a>
 {% for post in posts %}
     <ul>
         <li>{{ post.title }}</li>
