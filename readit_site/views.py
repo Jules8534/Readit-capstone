@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, redirect, HttpResponseRedirect
+from django.shortcuts import render, reverse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -144,12 +144,10 @@ def post_view(request, subreadit, user_id):
         return render(request, 'subreadit.html', {'form': form})
 
 
-
+@login_required
 def createsubreadit_view(request):
     context = {}
     user = request.user
-    if not user.is_authenticated:
-        return redirect('must_authenticate')
 
     form = CreateSubreaditForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -160,7 +158,4 @@ def createsubreadit_view(request):
         form = CreateSubreaditForm()
 
     context['form'] = form
-    return render(request, "create_subreadit.html", context)
-
-def must_authenticate_view(request):
-    return render(request, 'must_authenticate.html', {})    
+    return render(request, "create_subreadit.html", context)   
