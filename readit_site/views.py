@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm, ReaditUserModelForm, CreateSubreaditForm
-from .models import SubreaditModel, CreateSubreaditModel, ReaditUserModel
+from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm
+from .models import SubreaditModel, CreateSubreaditModel, ReaditUserModel, PostModel, SubscriptionModel
 # Create your views here.
 
 
@@ -64,6 +64,7 @@ def logoutview(request):
     logout(request)
     return HttpResponseRedirect(reverse('homepage'))
 
+
 def readitusermodel_view(request):
     context = {}
     if request.POST:
@@ -82,11 +83,66 @@ def readitusermodel_view(request):
         context['readitusermodel_form'] = form
     return render(request, 'register.html', context)
 
-def subreadit_view(request, subreadit):
-    pass
 
-def post_view(request, subreadit, postid):
-    pass
+def subreadit_view(request, subreadit):
+    context = {}
+    try:
+        subreadit_obj = SubreaditModel.objects.get(name=subreadit)
+        context["subreadit"] = subreadit_obj
+        subscription = SubscriptionModel.objects.get(
+            user=request.user, subreadit=subreadit_obj)
+        context["subscription"] = True
+    except SubreaditModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+    except SubscriptionModel.DoesNotExist:
+        context["subscription"] = False
+
+    context["posts"] = subreadit_obj.postmodel_set.all()
+    context["subscribe_link"] = reverse("subscribe", args=[subreadit])
+    return render(request, 'subreadit.html', context)
+
+
+@login_required
+def subreadit_subscribe(request, subreadit):
+    try:
+        subreadit_obj = SubreaditModel.objects.get(name=subreadit)
+        subscription = SubscriptionModel.objects.get(
+            user=request.user, subreadit=subreadit_obj)
+        subscription.delete()
+    except SubreaditModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+    except SubscriptionModel.DoesNotExist:
+        SubscriptionModel.objects.create(
+            user=request.user, subreadit=subreadit_obj)
+
+    return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
+
+
+@login_required
+def post_view(request, subreadit, user_id):
+    if request.method == 'POST':
+        form = AddPost(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return HttpResponseRedirect('add_post', pk=post.pk)
+        else:
+            form = AddPost()
+
+    # if request.method == 'POST':
+    #     form = AddPost(request.POST)
+    # if form.is_valid():
+    #     data = form.cleaned_data
+    #     all_user = ReaditUserModel.objects.all()
+    #     user = ReaditUserModel.objects.get(id=user_id)
+    #     post = PostModel.objects.create(
+    #         post=data['post'],
+    #         author=user,
+    #     )
+        return render(request, 'subreadit.html', {'form': form})
+
 
 
 def createsubreadit_view(request):
