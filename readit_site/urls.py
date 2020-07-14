@@ -5,7 +5,7 @@ urlpatterns = [
     path('', views.index, name="homepage"),
     path('change_password/',
          views.change_password, name='change_password'),
-    path('login/', views.login_view),
+    path('login/', views.login_view, name='login'),
     path('logout/', views.logoutview, name='logout_url'),
     path('register/', views.readitusermodel_view, name="register"),
     path('must_authenticate/', views.must_authenticate_view, name="must_authenticate"),

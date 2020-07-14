@@ -104,7 +104,7 @@ def createsubreadit_view(request):
         form = CreateSubreaditForm()
 
     context['form'] = form
-    return render(request, "create_subreadit", context)
+    return render(request, "create_subreadit.html", context)
 
 def must_authenticate_view(request):
-    return render(request, 'must_authenticate', ())    
+    return render(request, 'must_authenticate.html', {})    
