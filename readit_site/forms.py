@@ -2,7 +2,7 @@ from django import forms
 from .models import ReaditUserModel, PostModel
 from django.contrib.auth.forms import UserCreationForm
 
-# from readit_site.models import ReaditUserModel
+from readit_site.models import ReaditUserModel, SubreaditModel
 
 
 class LoginForm(forms.Form):
@@ -29,3 +29,11 @@ class AddPost(forms.ModelForm):
             'title',
             'content',
         )
+
+class CreateSubreaditForm(forms.Form):
+    name = forms.CharField(max_length=45)
+    description = forms.CharField(widget=forms.Textarea)
+    # image = forms.ImageField(blank=True)
+    class Meta:
+        model = SubreaditModel
+        fields = ("name", "description")

@@ -1,10 +1,10 @@
-from django.shortcuts import render, reverse, redirect, HttpResponseRedirect
+from django.shortcuts import render, reverse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm, ReaditUserModelForm, AddPost
-from .models import SubreaditModel, PostModel, ReaditUserModel, SubscriptionModel
+from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm
+from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel
 # Create your views here.
 
 
@@ -20,7 +20,6 @@ def index(request):
             "subreadits": subreadits,
         }
     )
-
 
 def login_view(request):
     html = "loginform.html"
@@ -136,5 +135,27 @@ def post_view(request, subreadit, user_id):
     pass
 
 
+@login_required
 def createsubreadit_view(request):
-    pass
+    context = {}
+    user = request.user
+
+    # form = CreateSubreaditForm(request.POST or None, request.FILES or None)
+    if request.method == "POST":
+        form = CreateSubreaditForm(request.POST)
+        if form.is_valid():
+            # obj = form.save(commit=False)
+            # obj.moderator = user
+            # obj.save()
+            data = form.cleaned_data
+            sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
+        else:
+            print(form.errors)
+    else:
+        print(f"Method: {request.method}")
+    form = CreateSubreaditForm()
+
+    context['form'] = form
+    context['name'] = request.user.username
+    return render(request, "create_subreadit.html", context)   
+ 
