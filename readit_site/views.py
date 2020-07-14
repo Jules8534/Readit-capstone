@@ -100,6 +100,18 @@ def subreadit_view(request, subreadit):
 
     context["posts"] = subreadit_obj.postmodel_set.all()
     context["subscribe_link"] = reverse("subscribe", args=[subreadit])
+
+    if request.method == 'POST':
+        form = AddPost(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            post = PostModel.objects.create(
+                title=data['title'],
+                content=data['content'],
+                user=request.user,
+                subreadit=subreadit_obj,
+            )
+    context['form'] = AddPost()
     return render(request, 'subreadit.html', context)
 
 
@@ -121,28 +133,7 @@ def subreadit_subscribe(request, subreadit):
 
 @login_required
 def post_view(request, subreadit, user_id):
-    if request.method == 'POST':
-        form = AddPost(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            return HttpResponseRedirect('add_post', pk=post.pk)
-        else:
-            form = AddPost()
-
-    # if request.method == 'POST':
-    #     form = AddPost(request.POST)
-    # if form.is_valid():
-    #     data = form.cleaned_data
-    #     all_user = ReaditUserModel.objects.all()
-    #     user = ReaditUserModel.objects.get(id=user_id)
-    #     post = PostModel.objects.create(
-    #         post=data['post'],
-    #         author=user,
-    #     )
-        return render(request, 'subreadit.html', {'form': form})
+    pass
 
 
 def createsubreadit_view(request):
