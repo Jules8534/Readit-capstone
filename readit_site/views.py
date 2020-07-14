@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm
-from .models import SubreaditModel, CreateSubreaditModel, ReaditUserModel, PostModel, SubscriptionModel
+from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel
 # Create your views here.
 
 
@@ -149,13 +149,22 @@ def createsubreadit_view(request):
     context = {}
     user = request.user
 
-    form = CreateSubreaditForm(request.POST or None, request.FILES or None)
-    if form.is_valid():
-        obj = form.save(commit=False)
-        author = ReaditUserModel.objects.filter(email=user.email).first()
-        obj.author = author
-        obj.save()
-        form = CreateSubreaditForm()
+    # form = CreateSubreaditForm(request.POST or None, request.FILES or None)
+    if request.method == "POST":
+        form = CreateSubreaditForm(request.POST)
+        if form.is_valid():
+            # obj = form.save(commit=False)
+            # obj.moderator = user
+            # obj.save()
+            data = form.cleaned_data
+            sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
+        else:
+            print(form.errors)
+    else:
+        print(f"Method: {request.method}")
+    form = CreateSubreaditForm()
 
     context['form'] = form
+    context['name'] = request.user.username
     return render(request, "create_subreadit.html", context)   
+ 
