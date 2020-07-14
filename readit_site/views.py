@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm, ReaditUserModelForm
-from .models import SubreaditModel
+from .forms import LoginForm, ReaditUserModelForm, CreateSubreaditForm
+from .models import SubreaditModel, CreateSubreaditModel, ReaditUserModel
 # Create your views here.
 
 
@@ -20,7 +20,6 @@ def index(request):
             "subreadits": subreadits,
         }
     )
-
 
 def login_view(request):
     html = "loginform.html"
@@ -38,7 +37,6 @@ def login_view(request):
             )
     form = LoginForm()
     return render(request, html, {"form": form})
-
 
 
 # https://simpleisbetterthancomplex.com/tips/2016/08/04/django-tip-9-password-change-form.html
@@ -90,5 +88,23 @@ def subreadit_view(request, subreadit):
 def post_view(request, subreadit, postid):
     pass
 
+
 def createsubreadit_view(request):
-    pass
+    context = {}
+    user = request.user
+    if not user.is_authenticated:
+        return redirect('must_authenticate')
+
+    form = CreateSubreaditForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        author = ReaditUserModel.objects.filter(email=user.email).first()
+        obj.author = author
+        obj.save()
+        form = CreateSubreaditForm()
+
+    context['form'] = form
+    return render(request, "create_subreadit", context)
+
+def must_authenticate_view(request):
+    return render(request, 'must_authenticate', ())    

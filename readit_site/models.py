@@ -15,8 +15,8 @@ class SubreaditModel(models.Model):
         return self.name
 
 class SubscriptionModel(models.Model):
-    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
-    subreadit = models.ForeignKey(SubreaditModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE),
+    subreadit = models.ForeignKey(SubreaditModel, on_delete=models.CASCADE),
 
     def __str__(self):
         return f"{self.user.username} \ {self.subreadit.name}"
@@ -43,3 +43,16 @@ class PostVoteModel(models.Model):
 class CommentVoteModel(models.Model):
     comment = models.ForeignKey(CommentModel, on_delete=models.CASCADE)
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
+
+class CreateSubreaditModel(models.Model):
+    title   = models.CharField(max_length=50, null=False, blank=False)
+    content = models.TextField(max_length=5000, null=False, blank=False)
+    image   = models.ImageField(upload_to=upload_location, null=False, blank=False)
+    date_published = models.DateTimeField(auto_now_add=True, verbase_name="date published")
+    date_updated   = models.DateTimeField(auto_now=True, verbase_name="date updated")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    slug = models.SlugField(blank=True, unique=True)
+
+    def __str__(self):
+        return self.title
+
