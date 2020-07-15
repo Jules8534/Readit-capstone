@@ -21,6 +21,7 @@ def index(request):
         }
     )
 
+
 def login_view(request):
     html = "loginform.html"
 
@@ -131,8 +132,10 @@ def subreadit_subscribe(request, subreadit):
 
 
 @login_required
-def post_view(request, subreadit, user_id):
-    pass
+def post_view(request, subreadit, postid):
+    sub = SubreaditModel.objects.get(name=subreadit)
+    post = PostModel.objects.get(id=postid)
+    return render(request, 'post.html', {'sub': sub, 'post': post})
 
 
 @login_required
@@ -148,7 +151,8 @@ def createsubreadit_view(request):
             # obj.moderator = user
             # obj.save()
             data = form.cleaned_data
-            sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
+            sub = SubreaditModel.objects.create(
+                name=data['name'], description=data["description"], moderator=request.user)
         else:
             print(form.errors)
     else:
@@ -157,5 +161,4 @@ def createsubreadit_view(request):
 
     context['form'] = form
     context['name'] = request.user.username
-    return render(request, "create_subreadit.html", context)   
- 
+    return render(request, "create_subreadit.html", context)
