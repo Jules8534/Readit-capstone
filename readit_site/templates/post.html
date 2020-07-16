@@ -6,5 +6,5 @@
 
 <p>
     <a href={% url 'homepage' %}><button>Home</button></a>
-    <a href={% url 'subreadit' sub.name %}><button>Back</button></a>
+    <a href={% url 'subreadit' sub.name %}><button>{{sub.name}}</button></a>
 </p>
