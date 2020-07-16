@@ -135,7 +135,10 @@ def subreadit_subscribe(request, subreadit):
 def post_view(request, subreadit, postid):
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
-    return render(request, 'post.html', {'sub': sub, 'post': post})
+    if post.subreadit == sub:
+        return render(request, 'post.html', {'sub': sub, 'post': post})
+    else:
+        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
 
 
 @login_required
