@@ -15,7 +15,7 @@ class SubreaditModel(models.Model):
     date_published = models.DateTimeField(auto_now_add=True, verbose_name="date published")
     date_updated   = models.DateTimeField(auto_now=True, verbose_name="date updated")
     # image   = models.ImageField(upload_to='uploads/', null=True, blank=True)
-    slug = models.SlugField(blank=True, unique=True)
+    # slug = models.SlugField(blank=True, unique=True)
 
     def __str__(self):
         return self.name
