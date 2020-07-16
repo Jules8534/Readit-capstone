@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, HttpResponseRedirect
+from django.shortcuts import render, reverse, HttpResponseRedirect, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -20,6 +20,7 @@ def index(request):
             "subreadits": subreadits,
         }
     )
+
 
 def login_view(request):
     html = "loginform.html"
@@ -148,7 +149,10 @@ def createsubreadit_view(request):
             # obj.moderator = user
             # obj.save()
             data = form.cleaned_data
-            sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
+            sub = SubreaditModel.objects.create(name=data['name'],
+                                                description=data["description"],
+                                                moderator=request.user)
+            return redirect('homepage')
         else:
             print(form.errors)
     else:
@@ -157,5 +161,5 @@ def createsubreadit_view(request):
 
     context['form'] = form
     context['name'] = request.user.username
-    return render(request, "create_subreadit.html", context)   
- 
+    return render(request, "create_subreadit.html", context)
+    # return HttpResponseRedirect(reverse('homepage'))
