@@ -11,14 +11,25 @@ from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionMode
 @login_required
 def index(request):
     html = "index.html"
+    context = {}
+    
     username = request.user.username
+    context['name'] = username
     subreadits = SubreaditModel.objects.all()
+    context['subreadits'] = subreadits
+
+    subscriptions = SubscriptionModel.objects.filter(user=request.user)
+    posts = PostModel.objects.none()
+
+    for sub in subscriptions:
+        posts = posts.union(sub.subreadit.postmodel_set.all())
+
+    if posts:
+        posts = posts.order_by('-created_at')
+        context['posts'] = posts
+
     return render(
-        request, html,
-        {
-            "name": username,
-            "subreadits": subreadits,
-        }
+        request, html,context
     )
 
 
