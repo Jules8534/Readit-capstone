@@ -30,10 +30,12 @@ class AddPost(forms.ModelForm):
             'content',
         )
 
-class CreateSubreaditForm(forms.Form):
+
+class CreateSubreaditForm(forms.ModelForm):
     name = forms.CharField(max_length=45)
     description = forms.CharField(widget=forms.Textarea)
-    # image = forms.ImageField(blank=True)
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = SubreaditModel
-        fields = ("name", "description")
+        fields = ("name", "description", "image",)

@@ -143,13 +143,8 @@ def subreadit_subscribe(request, subreadit):
 
 
 @login_required
-def post_view(request, subreadit, postid):
-    sub = SubreaditModel.objects.get(name=subreadit)
-    post = PostModel.objects.get(id=postid)
-    if post.subreadit == sub:
-        return render(request, 'post.html', {'sub': sub, 'post': post})
-    else:
-        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
+def post_view(request, subreadit, user_id):
+    pass
 
 
 @login_required
@@ -159,16 +154,14 @@ def createsubreadit_view(request):
 
     # form = CreateSubreaditForm(request.POST or None, request.FILES or None)
     if request.method == "POST":
-        form = CreateSubreaditForm(request.POST)
+        form = CreateSubreaditForm(request.POST, request.FILES)
         if form.is_valid():
-            # obj = form.save(commit=False)
-            # obj.moderator = user
-            # obj.save()
-            data = form.cleaned_data
-            sub = SubreaditModel.objects.create(name=data['name'],
-                                                description=data["description"],
-                                                moderator=request.user)
-            return HttpResponseRedirect(reverse('subreadit', args=[data['name']]))
+            obj = form.save(commit=False)
+            obj.moderator = user
+            obj.save()
+            return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
+            # data = form.cleaned_data
+            # sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
         else:
             print(form.errors)
     else:
