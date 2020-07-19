@@ -187,8 +187,3 @@ def createsubreadit_view(request):
     context['form'] = form
     context['name'] = request.user.username
     return render(request, "create_subreadit.html", context)
-
-
-@login_required
-def comment_view(request, post, postid):
-    pass
