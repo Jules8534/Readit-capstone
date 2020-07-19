@@ -13,9 +13,5 @@
   <input type="submit" value="Add Post" />
 </form>
 {% for post in posts %}
-<ul>
-  <li>{{ post.title }}</li>
-  <li>{{ post.content }}</li>
-  <li>{{ post.created_at }}</li>
-</ul>
+  {% include "post_snippet.html" %}
 {% endfor %}

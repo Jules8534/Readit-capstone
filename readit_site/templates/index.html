@@ -21,11 +21,7 @@
     <a href={% url 'new' %}><button>Create a new subredit</button></a>
 
     {% for post in posts %}
-        <ul>
-            <li>{{ post.title }}</li>
-            <li>{{ post.content }}</li>
-            <li>{{ post.created_at }}</li>
-        </ul>
+        {% include "post_snippet.html" %}
     {% endfor %}
 
 </div>
