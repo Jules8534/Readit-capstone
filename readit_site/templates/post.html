@@ -1,17 +1,22 @@
 <h1><a href={% url 'subreadit' sub.name %}>{{sub.name}}</a></h1>
 <h2>{{post.title}}</h2>
-<p>{{post.created_at}}</p>
+<p>Created on {{post.created_at}}</p>
 
 <p>{{post.content}}</p>
+<hr>
+<h3>Leave a comment below:</h3>
 <!-- comment form -->
 <form action="" method="POST">
     {% csrf_token %} 
     {{form.as_p}}
     <input type="submit" value="Comment" />
 </form>
+<hr>
+<h3>Comments:</h3>
 {% for comment in comments %}
-    <p>-{{comment.content}}</p>
+    <ul>- {{comment.content}}</ul>
 {% endfor %}
+<hr>
 <p>
     <a href={% url 'homepage' %}><button>Home</button></a>
 </p>
