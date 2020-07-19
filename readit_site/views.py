@@ -168,7 +168,7 @@ def createsubreadit_view(request):
             sub = SubreaditModel.objects.create(name=data['name'],
                                                 description=data["description"],
                                                 moderator=request.user)
-            return HttpResponseRedirect(reverse('homepage'))
+            return HttpResponseRedirect(reverse('subreadit', args=[data['name']]))
         else:
             print(form.errors)
     else:
