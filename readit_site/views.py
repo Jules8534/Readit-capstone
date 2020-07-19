@@ -136,16 +136,17 @@ def post_view(request, subreadit, postid):
     context = {}
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
+    comments = post.commentmodel_set.all()
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             comment = CommentModel.objects.create(
-                content=data['content']
-            )
-    context['form'] = CommentForm()
+                post=post,
+                user=request.user,
+                content=data['content'])
     if post.subreadit == sub:
-        return render(request, 'post.html', {'sub': sub, 'post': post, 'context': context})
+        return render(request, 'post.html', {'sub': sub, 'post': post, 'form': CommentForm(), 'comments': comments})
     else:
         return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
     return render(request, 'post.html', context)

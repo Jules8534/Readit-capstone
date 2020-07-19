@@ -5,9 +5,13 @@
 <p>{{post.content}}</p>
 <!-- comment form -->
 <form action="" method="POST">
-    {% csrf_token %} {{form.as_p}}
+    {% csrf_token %} 
+    {{form.as_p}}
     <input type="submit" value="Comment" />
 </form>
+{% for comment in comments %}
+    <p>-{{comment.content}}</p>
+{% endfor %}
 <p>
     <a href={% url 'homepage' %}><button>Home</button></a>
 </p>
