@@ -38,6 +38,7 @@ class PostModel(models.Model):
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     content = models.CharField(max_length=500)
+    url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
