@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, HttpResponseRedirect
+from django.shortcuts import render, reverse, HttpResponseRedirect, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -165,8 +165,10 @@ def createsubreadit_view(request):
             # obj.moderator = user
             # obj.save()
             data = form.cleaned_data
-            sub = SubreaditModel.objects.create(
-                name=data['name'], description=data["description"], moderator=request.user)
+            sub = SubreaditModel.objects.create(name=data['name'],
+                                                description=data["description"],
+                                                moderator=request.user)
+            return HttpResponseRedirect(reverse('homepage'))
         else:
             print(form.errors)
     else:
