@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, HttpResponseRedirect
+from django.shortcuts import render, reverse, HttpResponseRedirect, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -11,14 +11,25 @@ from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionMode
 @login_required
 def index(request):
     html = "index.html"
+    context = {}
+
     username = request.user.username
+    context['name'] = username
     subreadits = SubreaditModel.objects.all()
+    context['subreadits'] = subreadits
+
+    subscriptions = SubscriptionModel.objects.filter(user=request.user)
+    posts = PostModel.objects.none()
+
+    for sub in subscriptions:
+        posts = posts.union(sub.subreadit.postmodel_set.all())
+
+    if posts:
+        posts = posts.order_by('-created_at')
+        context['posts'] = posts
+
     return render(
-        request, html,
-        {
-            "name": username,
-            "subreadits": subreadits,
-        }
+        request, html, context
     )
 
 
@@ -159,14 +170,14 @@ def createsubreadit_view(request):
 
     # form = CreateSubreaditForm(request.POST or None, request.FILES or None)
     if request.method == "POST":
-        form = CreateSubreaditForm(request.POST)
+        form = CreateSubreaditForm(request.POST, request.FILES)
         if form.is_valid():
-            # obj = form.save(commit=False)
-            # obj.moderator = user
-            # obj.save()
-            data = form.cleaned_data
-            sub = SubreaditModel.objects.create(
-                name=data['name'], description=data["description"], moderator=request.user)
+            obj = form.save(commit=False)
+            obj.moderator = user
+            obj.save()
+            return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
+            # data = form.cleaned_data
+            # sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
         else:
             print(form.errors)
     else:

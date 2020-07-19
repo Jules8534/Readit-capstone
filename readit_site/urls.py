@@ -1,5 +1,7 @@
 from django.urls import path
 from readit_site import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index, name="homepage"),
@@ -16,4 +18,4 @@ urlpatterns = [
          views.subreadit_subscribe, name="subscribe"),
     path('r/<str:subreadit>/<int:postid>/', views.post_view,
          name="post"),  # TODO: add view subreadit/post
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

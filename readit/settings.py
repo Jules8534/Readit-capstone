@@ -121,3 +121,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'readit_site.ReaditUserModel'
 LOGIN_URL = '/login/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
