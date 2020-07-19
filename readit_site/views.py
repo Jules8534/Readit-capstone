@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm
-from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel
+from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm, CommentForm
+from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel
 # Create your views here.
 
 
@@ -12,7 +12,7 @@ from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionMode
 def index(request):
     html = "index.html"
     context = {}
-    
+
     username = request.user.username
     context['name'] = username
     subreadits = SubreaditModel.objects.all()
@@ -29,7 +29,7 @@ def index(request):
         context['posts'] = posts
 
     return render(
-        request, html,context
+        request, html, context
     )
 
 
@@ -143,8 +143,24 @@ def subreadit_subscribe(request, subreadit):
 
 
 @login_required
-def post_view(request, subreadit, user_id):
-    pass
+def post_view(request, subreadit, postid):
+    context = {}
+    sub = SubreaditModel.objects.get(name=subreadit)
+    post = PostModel.objects.get(id=postid)
+    comments = post.commentmodel_set.all()
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            comment = CommentModel.objects.create(
+                post=post,
+                user=request.user,
+                content=data['content'])
+    if post.subreadit == sub:
+        return render(request, 'post.html', {'sub': sub, 'post': post, 'form': CommentForm(), 'comments': comments})
+    else:
+        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
+    return render(request, 'post.html', context)
 
 
 @login_required
@@ -171,3 +187,8 @@ def createsubreadit_view(request):
     context['form'] = form
     context['name'] = request.user.username
     return render(request, "create_subreadit.html", context)
+
+
+@login_required
+def comment_view(request, post, postid):
+    pass
