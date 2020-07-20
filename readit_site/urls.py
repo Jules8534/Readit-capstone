@@ -19,5 +19,6 @@ urlpatterns = [
          name="post"),
     path('r/<str:subreadit>/<int:postid>/<str:action>/', views.post_action,
          name="post_action"),
-    path('delete/<postid>', views.delete_post, name='delete_post')
+    path('r/<str:subreadit>/<int:postid>/<int:commentid>/<str:action>/', views.comment_action,
+         name="comment_action"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
