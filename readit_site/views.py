@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+from .validators import validate_subreadit
 from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm, CommentForm
 from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel
 # Create your views here.
@@ -159,11 +160,16 @@ def createsubreadit_view(request):
     user = request.user
 
     form = CreateSubreaditForm(request.POST or None, request.FILES or None)
+    
     if form.is_valid():
-        obj = form.save(commit=False)
-        obj.moderator = user
-        obj.save()
-        return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
+        validation = validate_subreadit(form)
+        if validation == True:
+            obj = form.save(commit=False)
+            obj.moderator = user
+            obj.save()
+            return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
+        else:
+            context['errors'] = validation
 
     context['form'] = form
     context['name'] = request.user.username

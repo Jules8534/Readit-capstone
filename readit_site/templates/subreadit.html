@@ -3,7 +3,9 @@
 
 {% if subreadit.description %}
 <p>{{subreadit.description}}</p>
-<img src="{{ subreadit.image.url }}" style="width: 200px; height: 200px" /><br />
+{% endif %}
+{% if subreadit.image %}
+  <img src="{{ subreadit.image.url }}" style="width: 200px; height: 200px" /><br />
 {% endif %}
 <a href="{{subscribe_link}}">{{subscription|yesno:"Unsubscribe,Subscribe"}}</a>
 <h3>Add a post</h3>
