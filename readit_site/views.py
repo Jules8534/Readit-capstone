@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .validators import validate_subreadit
 from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm, CommentForm
-from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel, PostVoteModel
+from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel, PostVoteModel, CommentVoteModel
 # Create your views here.
 
 
@@ -138,9 +138,22 @@ def post_view(request, subreadit, postid):
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
     comments = post.commentmodel_set.all()
+    comment_data = {}
+    for comment in comments:
+        votes = comment.commentvotemodel_set.all()
+        upVotes = votes.filter(is_upVote=True)
+        downVotes = votes.filter(is_upVote=False)
 
-    upVotes = post.postvotemodel_set.filter(is_upVote=True)
-    downVotes = post.postvotemodel_set.filter(is_upVote=False)
+        count_upVotes = upVotes.count()
+        count_downVotes = downVotes.count()
+        can_upVote = not upVotes.filter(user=request.user).exists()
+        can_downVote = not downVotes.filter(user=request.user).exists()
+        comment_data[comment.id] = {'upVotes': count_upVotes, 'downVotes': count_downVotes,
+             'can_upVote': can_upVote, 'can_downVote': can_downVote}
+
+    votes = post.postvotemodel_set.all()
+    upVotes = votes.filter(is_upVote=True)
+    downVotes = votes.filter(is_upVote=False)
 
     count_upVotes = upVotes.count()
     count_downVotes = downVotes.count()
@@ -149,7 +162,7 @@ def post_view(request, subreadit, postid):
     votes = {'upVotes': count_upVotes, 'downVotes': count_downVotes,
              'can_upVote': can_upVote, 'can_downVote': can_downVote}
 
-    context = {'sub': sub, 'post': post, 'comments': comments, 'votes': votes}
+    context = {'sub': sub, 'post': post, 'comments': comments, 'comment_data': comment_data, 'votes': votes}
 
     form = CommentForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -158,6 +171,7 @@ def post_view(request, subreadit, postid):
             post=post,
             user=request.user,
             content=data['content'])
+        form = CommentForm()
 
     context['form'] = form
     context['is_moderator'] = sub.moderator == request.user
@@ -166,30 +180,50 @@ def post_view(request, subreadit, postid):
 
 @login_required
 def post_action(request, subreadit, postid, action):
-    post = PostModel.objects.get(id=postid)
-    if action == 'upvote':
+    try:
+        post = PostModel.objects.get(id=postid)
+    except PostModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+
+    if action == 'upvote' or action == 'downvote':
+        is_upVote = True if action == 'upvote' else False
         post_query = PostVoteModel.objects.filter(
-            user=request.user, post=post, is_upVote=True)
+            user=request.user, post=post, is_upVote=is_upVote)
         if post_query.exists():
             post_query.first().delete()
         else:
             PostVoteModel.objects.create(
-                user=request.user, post=post, is_upVote=True)
-        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
-    elif action == 'downvote':
-        post_query = PostVoteModel.objects.filter(
-            user=request.user, post=post, is_upVote=False)
-        if post_query.exists():
-            post_query.first().delete()
-        else:
-            PostVoteModel.objects.create(
-                user=request.user, post=post, is_upVote=False)
+                user=request.user, post=post, is_upVote=is_upVote)
         return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
     elif action == 'delete':
         subreadit_obj = SubreaditModel.objects.get(name=subreadit)
         if subreadit_obj.moderator == request.user:
             post.delete()
         return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
+    else:
+        return HttpResponseRedirect(reverse('homepage'))
+
+
+@login_required
+def comment_action(request, subreadit, postid, commentid, action):
+    try:
+        comment = CommentModel.objects.get(id=commentid)
+    except CommentModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+
+    if action == 'upvote' or action == 'downvote':
+        is_upVote = True if action == 'upvote' else False
+        comment_query = CommentVoteModel.objects.filter(user=request.user, comment=comment, is_upVote=is_upVote)
+        if comment_query.exists():
+            comment_query.first().delete()
+        else:
+            CommentVoteModel.objects.create(user=request.user, comment=comment, is_upVote=is_upVote)
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
+    elif action == 'delete':
+        subreadit_obj = SubreaditModel.objects.get(name=subreadit)
+        if subreadit_obj.moderator == request.user:
+            comment.delete()
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
     else:
         return HttpResponseRedirect(reverse('homepage'))
 
