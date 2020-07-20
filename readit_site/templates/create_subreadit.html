@@ -21,33 +21,13 @@
         <div class="col-lg-7 offset-lg-1">
             <form class="create-form" method="POST" action="" enctype="multipart/form-data">
                 {% csrf_token %}
-                <!-- enctype="multipart/form-data" -->
-                <!-- title
-                <div class="form-group">
-                    <label for="id_title">Title</label>
-                    <input class="form-control" type="text" name="title" id="name" placeholder="Title"
-                    required autofocus>
-                </div>
-
-                Content/Body                    
-                <div class="form-group">
-                    <label for="id_content">Content</label>
-                    <textarea class="form-control" rows="10" type="text" name="description" id="id_content" placeholder="
-                    This subreadit is about..." required></textarea>
-                </div>
-            
-                Image
-                <div class="form-group">
-                    <label for="id_image">Image</label>
-                    <input type="file" name="image" id="image" accept="image/*" required>
-                </div> -->
-                
                 {{form.as_p}}
-
                 Submit Button 
                 <button class="submit-button btn btn-lg btn-primary btn block" type="submit">POST</button>
-            
             </form>
+            {% if errors %}
+                <p>{{errors}}</p>
+            {% endif %}
         </div>
     </div>
 </div>
