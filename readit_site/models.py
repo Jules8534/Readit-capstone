@@ -54,9 +54,9 @@ class CommentModel(models.Model):
 class PostVoteModel(models.Model):
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
-
+    is_upVote = models.BooleanField()
 
 class CommentVoteModel(models.Model):
     comment = models.ForeignKey(CommentModel, on_delete=models.CASCADE)
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
-
+    is_upVote = models.BooleanField()
