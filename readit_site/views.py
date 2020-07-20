@@ -11,16 +11,13 @@ from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionMode
 @login_required
 def index(request):
     html = "index.html"
-    context = {}
 
     username = request.user.username
-    context['name'] = username
     subreadits = SubreaditModel.objects.all()
-    context['subreadits'] = subreadits
+    context = {'name': username, 'subreadits': subreadits}
 
     subscriptions = SubscriptionModel.objects.filter(user=request.user)
     posts = PostModel.objects.none()
-
     for sub in subscriptions:
         posts = posts.union(sub.subreadit.postmodel_set.all())
 
@@ -28,9 +25,7 @@ def index(request):
         posts = posts.order_by('-created_at')
         context['posts'] = posts
 
-    return render(
-        request, html, context
-    )
+    return render(request, html, context)
 
 
 def login_view(request):
@@ -78,7 +73,6 @@ def logoutview(request):
 
 
 def readitusermodel_view(request):
-    context = {}
     if request.POST:
         form = ReaditUserModelForm(request.POST)
         if form.is_valid():
@@ -88,12 +82,8 @@ def readitusermodel_view(request):
             account = authenticate(username=username, password=password)
             login(request, account)
             return redirect('homepage')
-        else:  # GET request
-            context['readitusermodel_form'] = form
-    else:
-        form = ReaditUserModelForm()
-        context['readitusermodel_form'] = form
-    return render(request, 'register.html', context)
+    
+    return render(request, 'register.html', {'form':ReaditUserModelForm()})
 
 
 def subreadit_view(request, subreadit):
@@ -112,17 +102,17 @@ def subreadit_view(request, subreadit):
     context["posts"] = subreadit_obj.postmodel_set.all()
     context["subscribe_link"] = reverse("subscribe", args=[subreadit])
 
-    if request.method == 'POST':
-        form = AddPost(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            post = PostModel.objects.create(
-                title=data['title'],
-                content=data['content'],
-                user=request.user,
-                subreadit=subreadit_obj,
-            )
-    context['form'] = AddPost()
+    form = AddPost(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.user = request.user
+        post.subreadit = subreadit_obj
+        post.save()
+        post.url = reverse('post', args=[subreadit, post.id])
+        post.save()
+
+            
+    context['form'] = form
     return render(request, 'subreadit.html', context)
 
 
@@ -144,23 +134,23 @@ def subreadit_subscribe(request, subreadit):
 
 @login_required
 def post_view(request, subreadit, postid):
-    context = {}
+
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
     comments = post.commentmodel_set.all()
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            comment = CommentModel.objects.create(
-                post=post,
-                user=request.user,
-                content=data['content'])
-    if post.subreadit == sub:
-        return render(request, 'post.html', {'sub': sub, 'post': post, 'form': CommentForm(), 'comments': comments})
-    else:
-        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
-    return render(request, 'post.html', context)
+
+    context = {'sub': sub, 'post': post, 'comments':comments}
+
+    form = CommentForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        data = form.cleaned_data
+        comment = CommentModel.objects.create(
+            post=post,
+            user=request.user,
+            content=data['content'])
+
+    context['form'] = form
+    return render(request, 'post.html', context) if post.subreadit == sub else HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
 
 
 @login_required
@@ -168,21 +158,12 @@ def createsubreadit_view(request):
     context = {}
     user = request.user
 
-    # form = CreateSubreaditForm(request.POST or None, request.FILES or None)
-    if request.method == "POST":
-        form = CreateSubreaditForm(request.POST, request.FILES)
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.moderator = user
-            obj.save()
-            return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
-            # data = form.cleaned_data
-            # sub = SubreaditModel.objects.create(name=data['name'], description=data["description"], moderator=request.user)
-        else:
-            print(form.errors)
-    else:
-        print(f"Method: {request.method}")
-    form = CreateSubreaditForm()
+    form = CreateSubreaditForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.moderator = user
+        obj.save()
+        return HttpResponseRedirect(reverse('subreadit', args=[form.cleaned_data['name']]))
 
     context['form'] = form
     context['name'] = request.user.username
