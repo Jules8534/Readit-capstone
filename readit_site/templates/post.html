@@ -24,3 +24,8 @@
 <p>
     <a href={% url 'homepage' %}><button>Home</button></a>
 </p>
+<p>
+    {% if is_moderator %}
+    <a href={% url 'post_action' sub.name post.id 'delete' %}><button>Delete Post</button></a>
+    {% endif %}
+</p>
