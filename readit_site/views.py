@@ -134,9 +134,14 @@ def subreadit_subscribe(request, subreadit):
 
 @login_required
 def post_view(request, subreadit, postid):
+    try:
+        sub = SubreaditModel.objects.get(name=subreadit)
+        post = PostModel.objects.get(id=postid)
+    except SubreaditModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('homepage'))
+    except PostModel.DoesNotExist:
+        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
 
-    sub = SubreaditModel.objects.get(name=subreadit)
-    post = PostModel.objects.get(id=postid)
     comments = post.commentmodel_set.all()
     comment_data = {}
     for comment in comments:
@@ -149,7 +154,7 @@ def post_view(request, subreadit, postid):
         can_upVote = not upVotes.filter(user=request.user).exists()
         can_downVote = not downVotes.filter(user=request.user).exists()
         comment_data[comment.id] = {'upVotes': count_upVotes, 'downVotes': count_downVotes,
-             'can_upVote': can_upVote, 'can_downVote': can_downVote}
+                                    'can_upVote': can_upVote, 'can_downVote': can_downVote}
 
     votes = post.postvotemodel_set.all()
     upVotes = votes.filter(is_upVote=True)
@@ -162,7 +167,8 @@ def post_view(request, subreadit, postid):
     votes = {'upVotes': count_upVotes, 'downVotes': count_downVotes,
              'can_upVote': can_upVote, 'can_downVote': can_downVote}
 
-    context = {'sub': sub, 'post': post, 'comments': comments, 'comment_data': comment_data, 'votes': votes}
+    context = {'sub': sub, 'post': post, 'comments': comments,
+               'comment_data': comment_data, 'votes': votes}
 
     form = CommentForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -213,11 +219,13 @@ def comment_action(request, subreadit, postid, commentid, action):
 
     if action == 'upvote' or action == 'downvote':
         is_upVote = True if action == 'upvote' else False
-        comment_query = CommentVoteModel.objects.filter(user=request.user, comment=comment, is_upVote=is_upVote)
+        comment_query = CommentVoteModel.objects.filter(
+            user=request.user, comment=comment, is_upVote=is_upVote)
         if comment_query.exists():
             comment_query.first().delete()
         else:
-            CommentVoteModel.objects.create(user=request.user, comment=comment, is_upVote=is_upVote)
+            CommentVoteModel.objects.create(
+                user=request.user, comment=comment, is_upVote=is_upVote)
         return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
     elif action == 'delete':
         subreadit_obj = SubreaditModel.objects.get(name=subreadit)
