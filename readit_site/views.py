@@ -83,8 +83,8 @@ def readitusermodel_view(request):
             account = authenticate(username=username, password=password)
             login(request, account)
             return redirect('homepage')
-    
-    return render(request, 'register.html', {'form':ReaditUserModelForm()})
+
+    return render(request, 'register.html', {'form': ReaditUserModelForm()})
 
 
 def subreadit_view(request, subreadit):
@@ -112,7 +112,6 @@ def subreadit_view(request, subreadit):
         post.url = reverse('post', args=[subreadit, post.id])
         post.save()
 
-            
     context['form'] = form
     return render(request, 'subreadit.html', context)
 
@@ -139,17 +138,18 @@ def post_view(request, subreadit, postid):
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
     comments = post.commentmodel_set.all()
-    
+
     upVotes = post.postvotemodel_set.filter(is_upVote=True)
     downVotes = post.postvotemodel_set.filter(is_upVote=False)
-    
+
     count_upVotes = upVotes.count()
     count_downVotes = downVotes.count()
     can_upVote = not upVotes.filter(user=request.user).exists()
     can_downVote = not downVotes.filter(user=request.user).exists()
-    votes = {'upVotes': count_upVotes, 'downVotes': count_downVotes, 'can_upVote': can_upVote, 'can_downVote':can_downVote}
+    votes = {'upVotes': count_upVotes, 'downVotes': count_downVotes,
+             'can_upVote': can_upVote, 'can_downVote': can_downVote}
 
-    context = {'sub': sub, 'post': post, 'comments':comments, 'votes': votes}
+    context = {'sub': sub, 'post': post, 'comments': comments, 'votes': votes}
 
     form = CommentForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -160,27 +160,39 @@ def post_view(request, subreadit, postid):
             content=data['content'])
 
     context['form'] = form
+    context['is_moderator'] = sub.moderator == request.user
     return render(request, 'post.html', context) if post.subreadit == sub else HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
+
 
 @login_required
 def post_action(request, subreadit, postid, action):
     post = PostModel.objects.get(id=postid)
     if action == 'upvote':
-        post_query = PostVoteModel.objects.filter(user=request.user, post=post, is_upVote=True)
+        post_query = PostVoteModel.objects.filter(
+            user=request.user, post=post, is_upVote=True)
         if post_query.exists():
             post_query.first().delete()
         else:
-            PostVoteModel.objects.create(user=request.user, post=post, is_upVote=True)
+            PostVoteModel.objects.create(
+                user=request.user, post=post, is_upVote=True)
         return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
     elif action == 'downvote':
-        post_query = PostVoteModel.objects.filter(user=request.user, post=post, is_upVote=False)
+        post_query = PostVoteModel.objects.filter(
+            user=request.user, post=post, is_upVote=False)
         if post_query.exists():
             post_query.first().delete()
         else:
-            PostVoteModel.objects.create(user=request.user, post=post, is_upVote=False)
+            PostVoteModel.objects.create(
+                user=request.user, post=post, is_upVote=False)
         return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
+    elif action == 'delete':
+        subreadit_obj = SubreaditModel.objects.get(name=subreadit)
+        if subreadit_obj.moderator == request.user:
+            post.delete()
+        return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
     else:
         return HttpResponseRedirect(reverse('homepage'))
+
 
 @login_required
 def createsubreadit_view(request):
@@ -188,7 +200,7 @@ def createsubreadit_view(request):
     user = request.user
 
     form = CreateSubreaditForm(request.POST or None, request.FILES or None)
-    
+
     if form.is_valid():
         validation = validate_subreadit(form)
         if validation == True:
@@ -202,3 +214,10 @@ def createsubreadit_view(request):
     context['form'] = form
     context['name'] = request.user.username
     return render(request, "create_subreadit.html", context)
+
+
+@login_required
+def delete_post(request, postid=None):
+    post_to_delete = PostModel.objects.get(id=postid)
+    post_to_delete.delete()
+    return HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
