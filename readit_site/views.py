@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from .validators import validate_subreadit
 from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm, CommentForm
-from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel
+from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel, PostVoteModel
 # Create your views here.
 
 
@@ -139,8 +139,17 @@ def post_view(request, subreadit, postid):
     sub = SubreaditModel.objects.get(name=subreadit)
     post = PostModel.objects.get(id=postid)
     comments = post.commentmodel_set.all()
+    
+    upVotes = post.postvotemodel_set.filter(is_upVote=True)
+    downVotes = post.postvotemodel_set.filter(is_upVote=False)
+    
+    count_upVotes = upVotes.count()
+    count_downVotes = downVotes.count()
+    can_upVote = not upVotes.filter(user=request.user).exists()
+    can_downVote = not downVotes.filter(user=request.user).exists()
+    votes = {'upVotes': count_upVotes, 'downVotes': count_downVotes, 'can_upVote': can_upVote, 'can_downVote':can_downVote}
 
-    context = {'sub': sub, 'post': post, 'comments':comments}
+    context = {'sub': sub, 'post': post, 'comments':comments, 'votes': votes}
 
     form = CommentForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -153,6 +162,25 @@ def post_view(request, subreadit, postid):
     context['form'] = form
     return render(request, 'post.html', context) if post.subreadit == sub else HttpResponseRedirect(reverse('subreadit', args=[subreadit]))
 
+@login_required
+def post_action(request, subreadit, postid, action):
+    post = PostModel.objects.get(id=postid)
+    if action == 'upvote':
+        post_query = PostVoteModel.objects.filter(user=request.user, post=post, is_upVote=True)
+        if post_query.exists():
+            post_query.first().delete()
+        else:
+            PostVoteModel.objects.create(user=request.user, post=post, is_upVote=True)
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
+    elif action == 'downvote':
+        post_query = PostVoteModel.objects.filter(user=request.user, post=post, is_upVote=False)
+        if post_query.exists():
+            post_query.first().delete()
+        else:
+            PostVoteModel.objects.create(user=request.user, post=post, is_upVote=False)
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
+    else:
+        return HttpResponseRedirect(reverse('homepage'))
 
 @login_required
 def createsubreadit_view(request):
