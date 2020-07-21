@@ -33,26 +33,6 @@ class IndexView(LoginRequiredMixin, TemplateView):
             posts = posts.order_by('-created_at')
             return posts
 
-
-# @login_required
-# def index(request):
-#     html = "index.html"
-
-#     username = request.user.username
-#     subreadits = SubreaditModel.objects.all()
-#     context = {'name': username, 'subreadits': subreadits}
-
-#     subscriptions = SubscriptionModel.objects.filter(user=request.user)
-#     posts = PostModel.objects.none()
-#     for sub in subscriptions:
-#         posts = posts.union(sub.subreadit.postmodel_set.all())
-
-#     if posts:
-#         posts = posts.order_by('-created_at')
-#         context['posts'] = posts
-
-#     return render(request, html, context)
-
 class LoginView(TemplateView):
     template_name = "loginform.html"
 
@@ -77,25 +57,6 @@ class LoginView(TemplateView):
                 request.GET.get('next', reverse('homepage'))
             )
 
-
-# def login_view(request):
-#     html = "loginform.html"
-
-#     if request.method == "POST":
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             data = form.cleaned_data
-#             user = authenticate(
-#                 request, username=data['username'], password=data['password'])
-#             if user:
-#                 login(request, user)
-#             return HttpResponseRedirect(
-#                 request.GET.get('next', reverse('homepage'))
-#             )
-#     form = LoginForm()
-#     return render(request, html, {"form": form})
-
-
 # https://simpleisbetterthancomplex.com/tips/2016/08/04/django-tip-9-password-change-form.html
 
 class ChangePasswordView(LoginRequiredMixin, TemplateView):
@@ -116,25 +77,6 @@ class ChangePasswordView(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(reverse('homepage'))
         else:
             messages.error(request, 'Please correct the error below.')
-
-
-# @login_required
-# def change_password(request):
-#     if request.method == 'POST':
-#         form = PasswordChangeForm(request.user, request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)
-#             messages.success(
-#                 request, 'Your password was successfully updated!')
-#             return HttpResponseRedirect(reverse('homepage'))
-#         else:
-#             messages.error(request, 'Please correct the error below.')
-#     else:
-#         form = PasswordChangeForm(request.user)
-#     return render(request, 'change_password.html', {
-#         'form': form
-#     })
 
 
 @login_required
@@ -247,7 +189,7 @@ def post_view(request, subreadit, postid):
             post=post,
             user=request.user,
             content=data['content'])
-        form = CommentForm()
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
 
     context['form'] = form
     context['is_moderator'] = sub.moderator == request.user
