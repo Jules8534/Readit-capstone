@@ -247,7 +247,7 @@ def post_view(request, subreadit, postid):
             post=post,
             user=request.user,
             content=data['content'])
-        form = CommentForm()
+        return HttpResponseRedirect(reverse('post', args=[subreadit, postid]))
 
     context['form'] = form
     context['is_moderator'] = sub.moderator == request.user
