@@ -3,36 +3,69 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
 from .validators import validate_subreadit
 from .forms import LoginForm, ReaditUserModelForm, AddPost, CreateSubreaditForm, CommentForm
 from .models import SubreaditModel, ReaditUserModel, PostModel, SubscriptionModel, CommentModel, PostVoteModel, CommentVoteModel
 # Create your views here.
 
 
-@login_required
-def index(request):
-    html = "index.html"
+class IndexView(LoginRequiredMixin, TemplateView):
+    template_name = 'index.html'
 
-    username = request.user.username
-    subreadits = SubreaditModel.objects.all()
-    context = {'name': username, 'subreadits': subreadits}
+    def get_context_data(self, *args, **kwargs):
+        context = super(IndexView, self).get_context_data(*args, **kwargs)
+        context['name'] = self.request.user.username
+        context['subreadits'] = SubreaditModel.objects.all()
+        if self.get_posts():
+            context['posts'] = self.get_posts()
+        return context
 
-    subscriptions = SubscriptionModel.objects.filter(user=request.user)
-    posts = PostModel.objects.none()
-    for sub in subscriptions:
-        posts = posts.union(sub.subreadit.postmodel_set.all())
+    def get_posts(self):
+        subscriptions = SubscriptionModel.objects.filter(
+            user=self.request.user)
+        posts = PostModel.objects.none()
+        for sub in subscriptions:
+            posts = posts.union(sub.subreadit.postmodel_set.all())
 
-    if posts:
-        posts = posts.order_by('-created_at')
-        context['posts'] = posts
-
-    return render(request, html, context)
+        if posts:
+            posts = posts.order_by('-created_at')
+            return posts
 
 
-def login_view(request):
-    html = "loginform.html"
+# @login_required
+# def index(request):
+#     html = "index.html"
 
-    if request.method == "POST":
+#     username = request.user.username
+#     subreadits = SubreaditModel.objects.all()
+#     context = {'name': username, 'subreadits': subreadits}
+
+#     subscriptions = SubscriptionModel.objects.filter(user=request.user)
+#     posts = PostModel.objects.none()
+#     for sub in subscriptions:
+#         posts = posts.union(sub.subreadit.postmodel_set.all())
+
+#     if posts:
+#         posts = posts.order_by('-created_at')
+#         context['posts'] = posts
+
+#     return render(request, html, context)
+
+class LoginView(TemplateView):
+    template_name = "loginform.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(LoginView, self).get_context_data(*args, **kwargs)
+        context['form'] = LoginForm()
+        return context
+
+    # GET, POST, PUT, DELETE
+    # if request.method === 'post'
+    # def post()
+
+    def post(self, request):
         form = LoginForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
@@ -43,14 +76,37 @@ def login_view(request):
             return HttpResponseRedirect(
                 request.GET.get('next', reverse('homepage'))
             )
-    form = LoginForm()
-    return render(request, html, {"form": form})
+
+
+# def login_view(request):
+#     html = "loginform.html"
+
+#     if request.method == "POST":
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             data = form.cleaned_data
+#             user = authenticate(
+#                 request, username=data['username'], password=data['password'])
+#             if user:
+#                 login(request, user)
+#             return HttpResponseRedirect(
+#                 request.GET.get('next', reverse('homepage'))
+#             )
+#     form = LoginForm()
+#     return render(request, html, {"form": form})
 
 
 # https://simpleisbetterthancomplex.com/tips/2016/08/04/django-tip-9-password-change-form.html
-@login_required
-def change_password(request):
-    if request.method == 'POST':
+
+class ChangePasswordView(LoginRequiredMixin, TemplateView):
+    template_name = 'change_password.html'
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(ChangePasswordView, self).get_context_data(*args, **kwargs)
+        context['form'] = PasswordChangeForm(self.request.user)
+        return context
+
+    def post(self, request):
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
@@ -60,11 +116,25 @@ def change_password(request):
             return HttpResponseRedirect(reverse('homepage'))
         else:
             messages.error(request, 'Please correct the error below.')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
-        'form': form
-    })
+
+
+# @login_required
+# def change_password(request):
+#     if request.method == 'POST':
+#         form = PasswordChangeForm(request.user, request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             update_session_auth_hash(request, user)
+#             messages.success(
+#                 request, 'Your password was successfully updated!')
+#             return HttpResponseRedirect(reverse('homepage'))
+#         else:
+#             messages.error(request, 'Please correct the error below.')
+#     else:
+#         form = PasswordChangeForm(request.user)
+#     return render(request, 'change_password.html', {
+#         'form': form
+#     })
 
 
 @login_required

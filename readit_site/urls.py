@@ -4,10 +4,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.index, name="homepage"),
+    path('', views.IndexView.as_view(), name="homepage"),
     path('change_password/',
-         views.change_password, name='change_password'),
-    path('login/', views.login_view, name='login'),
+         views.ChangePasswordView.as_view(), name='change_password'),
+    path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logoutview, name='logout_url'),
     path('register/', views.readitusermodel_view, name="register"),
     path('new/', views.createsubreadit_view,
