@@ -1,19 +1,38 @@
+{% extends 'base.html' %}
 {% load static %}
+
+
+{% block content %}
 <h1>Welcome to the {{subreadit.name}} community</h1>
 
 {% if subreadit.description %}
 <p>{{subreadit.description}}</p>
 {% endif %}
 {% if subreadit.image %}
-  <img src="{{ subreadit.image.url }}" style="width: 200px; height: 200px" /><br />
+  <img src="{{ subreadit.image.url }}" class='img-thumbnail' /><br />
 {% endif %}
 <a href="{{subscribe_link}}">{{subscription|yesno:"Unsubscribe,Subscribe"}}</a>
 <h3>Add a post</h3>
 <!-- post form goes here -->
 <form action="" method="POST">
-  {% csrf_token %} {{form.as_p}}
+  {% csrf_token %}
+  {% for field in form %}
+    <div class='form-gorup'>
+        <label>{{field.label_tag}}</label>
+        {{field}}
+        {% if field.help_text %}
+        <small style="color:grey;">{{field.help_text}}</small>
+        {% endif %}
+
+        {% for error in field.errors %}
+        <p style="color: red;">{{error}}</p>
+        {% endfor %}
+
+    </div>
+    {% endfor %}
   <input type="submit" value="Add Post" />
 </form>
 {% for post in posts %}
   {% include "post_snippet.html" %}
 {% endfor %}
+{% endblock %}
