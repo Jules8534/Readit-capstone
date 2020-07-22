@@ -42,9 +42,6 @@
 {% endfor %}
 <hr>
 <p>
-    <a href={% url 'homepage' %}><button class="btn btn-primary btn-sm">Home</button></a>
-</p>
-<p>
     {% if is_moderator %}
     <a href={% url 'post_action' sub.name post.id 'delete' %}><button class="btn btn-danger btn-sm">Delete Post</button></a>
     {% endif %}

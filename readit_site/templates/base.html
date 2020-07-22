@@ -8,7 +8,6 @@
       crossorigin="anonymous"
     />
   </head>
-
   <body>
     <div
       style="
@@ -16,15 +15,16 @@
         background: #ff4301;
         color: White;
         padding-top: 8px;
+        height: 7vh;
       "
     >
-      <h2 class="text-center">Readit</h2>
+    <h2 class="text-center"><a href={% url 'homepage' %} style='text-decoration: none; color: white;'>Readit</a></h2>
     </div>
-
-    {% block content %} {% endblock %}
-
+    <div style="min-height: 86vh; padding: 10px;">
+        {% block content %} {% endblock %}
+    </div>
     <footer>
-      <div style="border: 1px solid #000; padding-left: 10px;">
+      <div style="border: 1px solid #000; padding-left: 10px; height: 7vh;">
         <h3>Created by David Richardson, Sean Bailey, and Julita Marshall</h3>
       </div>
     </footer>
