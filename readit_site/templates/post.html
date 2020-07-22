@@ -18,12 +18,14 @@
 <form action="" method="POST">
     {% csrf_token %} 
     {{form.as_p}}
-    <input type="submit" value="Comment" />
+    <button class="submit-button btn btn-primary" type="submit">
+        Comment
+    </button>
 </form>
 <hr>
 <h3>Comments:</h3>
 {% for comment in comments %}
-<div style='border: 1px solid black; margin:5px; padding-left: 25;'>
+<div style='border: 1px solid black; margin:5px; padding-left: 25; background-color: rgba(0,0,0,0.75); color: white'>
     {% with comment_votes=comment_data|lookup:comment.id %}
     <div style="padding-left: 5px;">
         <p>{{comment.user.username}} | {{comment.content}}</p>
