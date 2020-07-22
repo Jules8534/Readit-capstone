@@ -2,14 +2,15 @@
 {% load lookup%}
 
 {% block content %}
+<div style="padding-left: 10px;">
 <h1><a href={% url 'subreadit' sub.name %}>{{sub.name}}</a></h1>
 <h2>{{post.title}}</h2>
 <p>Created on {{post.created_at}}</p>
 
 <p>{{post.content}}</p>
 <p>
-    <button class="btn btn-primary"><a href={% url 'post_action' sub.name post.id 'upvote' %}>{{votes.can_upVote|yesno:"Up vote:,Remove up vote:"}}</a></button> {{ votes.upVotes }} |
-    <button class="btn btn-primary"><a href={% url 'post_action' sub.name post.id 'downvote' %}>{{votes.can_downVote|yesno:"Down vote:,Remove Down vote:"}}</a></button> {{ votes.downVotes }}
+    <a href={% url 'post_action' sub.name post.id 'upvote' %}><button class="btn btn-primary">{{votes.can_upVote|yesno:"Up vote:,Remove up vote:"}}</button></a> {{ votes.upVotes }} |
+    <a href={% url 'post_action' sub.name post.id 'downvote' %}><button class="btn btn-primary">{{votes.can_downVote|yesno:"Down vote:,Remove Down vote:"}}</button></a> {{ votes.downVotes }}
 </p>
 <hr>
 <h3>Leave a comment below:</h3>
@@ -24,24 +25,27 @@
 {% for comment in comments %}
 <div style='border: 1px solid black; margin:5px; padding-left: 25;'>
     {% with comment_votes=comment_data|lookup:comment.id %}
+    <div style="padding-left: 5px;">
         <p>{{comment.user.username}} | {{comment.content}}</p>
         <p>
-            <button class="btn btn-primary"><a href={% url 'comment_action' sub.name post.id comment.id 'upvote' %}>{{comment_votes.can_upVote|yesno:"Up vote:,Remove up vote:"}}</a></button> {{ comment_votes.upVotes }} |
+            <a href={% url 'comment_action' sub.name post.id comment.id 'upvote' %}><button class="btn btn-primary">{{comment_votes.can_upVote|yesno:"Up vote:,Remove up vote:"}}</button></a> {{ comment_votes.upVotes }} |
             <a href={% url 'comment_action' sub.name post.id comment.id 'downvote' %}><button class="btn btn-primary">{{comment_votes.can_downVote|yesno:"Down vote:,Remove Down vote:"}}</button></a> {{ comment_votes.downVotes }}
             {% if is_moderator %}
-                | <a href={% url 'comment_action' sub.name post.id comment.id 'delete' %}><button class='btn btn-primary'>Delete Comment</button></a>
+                | <a href={% url 'comment_action' sub.name post.id comment.id 'delete' %}><button class='btn btn-danger'>Delete Comment</button></a>
             {% endif %}
         </p>
+    </div>
     {% endwith %}
 </div>
 {% endfor %}
 <hr>
 <p>
-    <a href={% url 'homepage' %}><button>Home</button></a>
+    <a href={% url 'homepage' %}><button class="btn btn-primary btn-sm">Home</button></a>
 </p>
 <p>
     {% if is_moderator %}
-    <a href={% url 'post_action' sub.name post.id 'delete' %}><button>Delete Post</button></a>
+    <a href={% url 'post_action' sub.name post.id 'delete' %}><button class="btn btn-danger btn-sm">Delete Post</button></a>
     {% endif %}
 </p>
+</div>
 {% endblock %}

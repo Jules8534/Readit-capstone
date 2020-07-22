@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html lang=en>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+  </head>
 
-<head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-</head>
-
-<body>
-    <div style="border: 2px solid #000;">
-        <h2 class="text-center">Readit</h2>
+  <body>
+    <div
+      style="
+        border: 1px solid #000;
+        background: #ff4301;
+        color: White;
+        padding-top: 8px;
+      "
+    >
+      <h2 class="text-center">Readit</h2>
     </div>
-    {% block content %}
 
-
-    {% endblock %}
+    {% block content %} {% endblock %}
 
     <footer>
-        <div style="border: 2px solid #000;">
-            <h2>This is the footer</h2>
-        </div>
+      <div style="border: 1px solid #000; padding-left: 10px;">
+        <h3>Created by David Richardson, Sean Bailey, and Julita Marshall</h3>
+      </div>
     </footer>
-</body>
-
+  </body>
 </html>

@@ -1,38 +1,33 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div style="padding-left: 10px;">
+  <h1>Welcome to the {{subreadit.name}} community</h1>
 
-
-{% block content %}
-<h1>Welcome to the {{subreadit.name}} community</h1>
-
-{% if subreadit.description %}
-<p>{{subreadit.description}}</p>
-{% endif %}
-{% if subreadit.image %}
-  <img src="{{ subreadit.image.url }}" class='img-thumbnail' /><br />
-{% endif %}
-<a href="{{subscribe_link}}">{{subscription|yesno:"Unsubscribe,Subscribe"}}</a>
-<h3>Add a post</h3>
-<!-- post form goes here -->
-<form action="" method="POST">
-  {% csrf_token %}
-  {% for field in form %}
-    <div class='form-gorup'>
-        <label>{{field.label_tag}}</label>
-        {{field}}
-        {% if field.help_text %}
-        <small style="color:grey;">{{field.help_text}}</small>
-        {% endif %}
-
-        {% for error in field.errors %}
-        <p style="color: red;">{{error}}</p>
-        {% endfor %}
-
+  {% if subreadit.description %}
+  <p>{{subreadit.description}}</p>
+  {% endif %} {% if subreadit.image %}
+  <img src="{{ subreadit.image.url }}" class="img-thumbnail" /><br />
+  {% endif %}
+  <a href="{{subscribe_link}}"
+    >{{subscription|yesno:"Unsubscribe,Subscribe"}}</a
+  >
+  <h3>Add a post</h3>
+  <!-- post form goes here -->
+  <form action="" method="POST">
+    {% csrf_token %} {% for field in form %}
+    <div class="form-gorup">
+      <label>{{field.label_tag}}</label>
+      {{field}} {% if field.help_text %}
+      <small style="color: grey;">{{field.help_text}}</small>
+      {% endif %} {% for error in field.errors %}
+      <p style="color: red;">{{error}}</p>
+      {% endfor %}
     </div>
     {% endfor %}
-  <input type="submit" value="Add Post" />
-</form>
-{% for post in posts %}
-  {% include "post_snippet.html" %}
-{% endfor %}
+    <button class="submit-button btn btn-primary btn block" type="submit">Add Post</button>
+  </form>
+  {% for post in posts %} {% include "post_snippet.html" %} {% endfor %}
+  <p>
+    <a href={% url 'homepage' %}><button class="btn btn-primary btn-sm">Home</button></a>
+  </p>
+</div>
 {% endblock %}

@@ -1,38 +1,36 @@
-{% extends 'base.html' %}
-    {% load static %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <style type="text/css">
-    .create-form {
-        width: 100%;
-        max-width: 100%;
-        padding: 15px;
-        margin: auto;
-
-    }
-    .submit-button{
-        max-width: 200px;
-    }
+  .create-form {
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+    margin: auto;
+  }
+  .submit-button {
+    max-width: 200px;
+  }
 </style>
 
 <!-- https://docs.djangoproject.com/en/3.0/ref/request-response/#django.http.HttpRequest.FILES -->
 <div class="container">
-    <div class="row">
-        <div class="col-lg-7 offset-lg-1">
-            <form class="create-form" method="POST" action="" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{form.as_p}}
-                Submit Button 
-                <button class="submit-button btn btn-lg btn-primary btn block" type="submit">POST</button>
-            </form>
-            {% if errors %}
-                <p>{{errors}}</p>
-            {% endif %}
-        </div>
+  <div class="row">
+    <div class="col-lg-7 offset-lg-1">
+      <form
+        class="create-form"
+        method="POST"
+        action=""
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %} {{form.as_p}}
+        <button class="submit-button btn btn-primary btn block" type="submit">
+          Submit
+        </button>
+      </form>
+      {% if errors %}
+      <p>{{errors}}</p>
+      {% endif %}
     </div>
+  </div>
 </div>
 
-
 {% endblock %}
-
-
