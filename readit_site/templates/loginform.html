@@ -1,6 +1,8 @@
+{% extends 'base.html' %} {% block content %}
 <h1>You must be logged in.</h1>
 <form action="" method="POST">
   {% csrf_token %} {{ form.as_p }}
   <input type="submit" value="Log in" />
 </form>
 <p>Not a member? Sign up <a href={% url 'register' %}>here</a>.</p>
+{% endblock %}

@@ -1,29 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div>
-    <a href={%url 'change_password'%}><button>Change Password</button></a>
-    <a href={%url 'logout_url'%}><button>Logout</button></a>
-</div>
-
-<div style="border: 2px solid #000;">
-    <h1>This is the body</h1>
-    <p>This is where you would place info for the body of the site.</p>
-
-    <ul>
-        {% for subreadit in subreadits %}
-        <li><a href="/r/{{ subreadit.name }}/">{{ subreadit.name }}</a></li>
-        {% endfor %}
-    </ul>
-
-    {% include 'snippets/snippet.html' %}
-
-    <a href={% url 'new' %}><button>Create a new subredit</button></a>
-
-    {% for post in posts %}
+<div >
+    
+    <div style="border: 1px solid #000; padding-left: 10px;">
+        <h3>Subreadits</h3>
+        
+        <ul>
+            {% for subreadit in subreadits %}
+            <li><a href="/r/{{ subreadit.name }}/">{{ subreadit.name }}</a></li>
+            {% endfor %}
+        </ul>
+        
+        <!-- {% include 'snippets/snippet.html' %} -->
+        
+        <a href={% url 'new' %}><button class="btn btn-primary btn-sm">Create a new subreadit</button></a>
+        
+        {% for post in posts %}
         {% include "post_snippet.html" %}
-    {% endfor %}
-
+        {% endfor %}
+        
+    </div>
 </div>
-
+<div style="padding-left: 10px; padding-top: 5px; padding-bottom: 5px;">
+    <a href={%url 'change_password'%}><button class="btn btn-primary btn-sm">Change Password</button></a>
+    <a href={%url 'logout_url'%}><button class="btn btn-danger btn-sm">Logout</button></a>
+</div>
 {% endblock content %}
