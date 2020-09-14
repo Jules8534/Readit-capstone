@@ -35,10 +35,11 @@ class CreateSubreaditForm(forms.ModelForm):
     name = forms.CharField(max_length=45)
     description = forms.CharField(widget=forms.Textarea)
     image = forms.ImageField(required=False)
+    video = forms.FileField(required=False)
 
     class Meta:
         model = SubreaditModel
-        fields = ("name", "description", "image")
+        fields = ("name", "description", "image", "video")
 
 
 class CommentForm(forms.ModelForm):

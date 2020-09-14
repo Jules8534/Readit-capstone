@@ -20,6 +20,8 @@ class SubreaditModel(models.Model):
         auto_now=True, verbose_name="date updated")
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)
     # slug = models.SlugField(blank=True, unique=True)
+    video = models.FileField(
+        upload_to='uploads/videos/', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -55,6 +57,7 @@ class PostVoteModel(models.Model):
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
     user = models.ForeignKey(ReaditUserModel, on_delete=models.CASCADE)
     is_upVote = models.BooleanField()
+
 
 class CommentVoteModel(models.Model):
     comment = models.ForeignKey(CommentModel, on_delete=models.CASCADE)
