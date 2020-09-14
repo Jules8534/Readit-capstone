@@ -1,0 +1,13 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<h2>Create Subreadit</h2>
+<!-- https://docs.djangoproject.com/en/3.0/ref/request-response/#django.http.HttpRequest.FILES -->
+<form class="create-form" method="POST" action="" enctype="multipart/form-data">
+  {% csrf_token %} {{form.as_p}}
+  <button class="submit-button btn btn-primary" type="submit">
+    Submit
+  </button>
+</form>
+{% if errors %}
+<p>{{errors}}</p>
+{% endif %} {% endblock %}

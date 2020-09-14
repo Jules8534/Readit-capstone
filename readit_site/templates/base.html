@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div
+      style="
+        border: 1px solid #000;
+        background: #ff4301;
+        color: White;
+        padding-top: 8px;
+        height: 7vh;
+      "
+    >
+    <h2 class="text-center"><a href={% url 'homepage' %} style='text-decoration: none; color: white;'>Readit</a></h2>
+    </div>
+    <div style="min-height: 86vh; padding: 10px;">
+        {% block content %} {% endblock %}
+    </div>
+    <footer>
+      <div style="border: 1px solid #000; padding-left: 10px; height: 7vh;">
+        <h3>Created by David Richardson, Sean Bailey, and Julita Marshall</h3>
+      </div>
+    </footer>
+  </body>
+</html>
