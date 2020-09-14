@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": ".venv/bin/python"
+    "python.pythonPath": "/Users/julita/.pyenv/versions/3.8.2/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }
